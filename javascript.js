@@ -78,6 +78,7 @@ function endGame() {
     resultDiv.textContent = message;
     buttons.forEach((button) => {
         button.disabled = true;
+        button.style.backgroundColor = "gray";
     });
 }
 
