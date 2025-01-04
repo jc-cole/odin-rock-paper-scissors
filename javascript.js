@@ -29,9 +29,6 @@ function capitalize(str) {
     return first.toUpperCase() + str.slice(1);
 }
 
-let humanScore = 0;
-let computerScore = 0;
-
 function playRound(humanChoice, computerChoice) {
     let cases = {
         "paperrock": "win",
@@ -45,24 +42,62 @@ function playRound(humanChoice, computerChoice) {
         "scissorspaper": "win"
     }
     let result = cases[humanChoice + computerChoice]
+    // using object property shorthand
+    return {
+        result, 
+        humanChoice, 
+        computerChoice,
+    }
+}
 
-    if (result === "win") {
+function updateScore(resultObject) {
+    if (resultObject.result === "win") {
         humanScore++;
     }
 
-    if (result === "lose") {
+    if (resultObject.result=== "lose") {
         computerScore++;
     }
-
-    return (result === "tie") ? `You tied!\n\nThe computer chose ${computerChoice}.` : `You ${result}!\n\nThe computer chose ${computerChoice}.`;
+    const humanScoreDiv = document.querySelector("#human-score");
+    const computerScoreDiv = document.querySelector("#computer-score");
+    humanScoreDiv.textContent = `You: ${humanScore}`;
+    computerScoreDiv.textContent = `Computer: ${computerScore}`;
 }
 
-function playGame() {
-    for (let i = 0; i < 5; i++) {
-        alert(playRound(getUserChoice(), getComputerChoice()));
-    }
-    let result = (humanScore === computerScore) ? "tied" : (humanScore > computerScore) ? "win" : "lose";
-    alert(`You ${result}!\n\nFinal score:\nYou: ${humanScore}\nComputer: ${computerScore}`)
+function updateResult(resultObject) {
+    const resultDiv = document.querySelector("#results");
+    resultDiv.textContent = (resultObject.result === "tie") ? 
+    `You tied!\n\nThe computer chose ${resultObject.computerChoice}.` :
+    `You ${resultObject.result}!\n\nThe computer chose ${resultObject.computerChoice}.`;
 }
 
-playGame();
+function endGame() {
+    const resultDiv = document.querySelector("#results");
+    const result = (humanScore === computerScore) ? "tied" : (humanScore > computerScore) ? "win" : "lose";
+    const message = `You ${result}!\r\n\r\nFinal score:\r\nYou: ${humanScore}\r\nComputer: ${computerScore}`;
+    resultDiv.textContent = message;
+    buttons.forEach((button) => {
+        button.disabled = true;
+    });
+}
+
+
+let humanScore = 0;
+let computerScore = 0;
+
+let rounds = 0;
+
+let buttons = document.querySelectorAll("button");
+
+buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+        const resultObject = playRound(button.id, getComputerChoice());
+        updateScore(resultObject);
+        updateResult(resultObject);
+        rounds++;
+        if (rounds == 5) {
+            endGame();
+        }
+    });
+});
+
